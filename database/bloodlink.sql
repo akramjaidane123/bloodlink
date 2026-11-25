@@ -22,11 +22,23 @@ CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(150) NOT NULL UNIQUE,
+    phone CHAR(8) NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role ENUM('user', 'centre', 'admin') NOT NULL DEFAULT 'user',
     centre_id INT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_users_centre FOREIGN KEY (centre_id) REFERENCES centres(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS password_resets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    channel ENUM('email', 'phone') NOT NULL,
+    code_hash CHAR(64) NOT NULL,
+    attempts TINYINT NOT NULL DEFAULT 0,
+    expires_at DATETIME NOT NULL,
+    created_at DATETIME NOT NULL,
+    CONSTRAINT fk_reset_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS sponsors (
@@ -124,10 +136,10 @@ INSERT IGNORE INTO centres (id, name, address, phone, status, gouvernorat_id) VA
  (3,'CRTS Sousse','Hôpital Farhat Hached, Sousse','73 000 000','validated',3),
  (4,'Centre Ariana (en attente)','Ariana Ville','71 111 111','pending',4);
 
-INSERT IGNORE INTO users (id, username, email, password, role, centre_id) VALUES
- (1,'admin','admin@bloodlink.tn','$2y$10$FnsM18aXtXcdQ9CaJHFu5eDOIU5Kx7HwjEHBO7MoXTclXW0F44.3y','admin',NULL),
- (2,'centre_tunis','centre@bloodlink.tn','$2y$10$0cUP.v.VgMJqYvU0I9UuSOAwqe9LJyfQWupvSw.2NPc6r7By6ZupK','centre',1),
- (3,'donneur','donneur@bloodlink.tn','$2y$10$r.F8KovIQBFE5SGtYiawhe1D.EY0Ssk/pRcZSnfIIFkw7uCSwza1q','user',NULL);
+INSERT IGNORE INTO users (id, username, email, phone, password, role, centre_id) VALUES
+ (1,'admin','admin@bloodlink.tn','20000001','$2y$10$FnsM18aXtXcdQ9CaJHFu5eDOIU5Kx7HwjEHBO7MoXTclXW0F44.3y','admin',NULL),
+ (2,'centre_tunis','centre@bloodlink.tn','20000002','$2y$10$0cUP.v.VgMJqYvU0I9UuSOAwqe9LJyfQWupvSw.2NPc6r7By6ZupK','centre',1),
+ (3,'donneur','donneur@bloodlink.tn','20000003','$2y$10$r.F8KovIQBFE5SGtYiawhe1D.EY0Ssk/pRcZSnfIIFkw7uCSwza1q','user',NULL);
 
 INSERT IGNORE INTO sponsors (id, name, email, phone) VALUES
  (1,'Banque Horizon','contact@horizon.tn','70 100 100'),(2,'Pharma Santé','info@pharmasante.tn','71 200 200');
